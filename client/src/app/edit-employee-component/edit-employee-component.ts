@@ -13,7 +13,7 @@ import { EmployeeService } from '../employee.service';
 })
 export class EditEmployeeComponent implements OnInit {
 
-  employee = {} as WritableSignal<Employee | null>;
+  employee = {} as WritableSignal<Employee | any>;
   constructor(
     private router: Router,
     private employeeService: EmployeeService,

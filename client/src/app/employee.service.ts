@@ -10,23 +10,26 @@ export class EmployeeService {
     private url = 'http://localhost:5200';
     employees$ = signal<Employee[]>([]);
     employee$ = signal<Employee | null>(null);
+    employeeCount$ = signal<number>(0);
 
     constructor(private http: HttpClient) { }
 
-    private refreshEmployees() {
-        this.http.get<Employee[]>(`${this.url}/employees`).subscribe(employees => {
-            this.employees$.set(employees);
+    private refreshEmployees(page: number = 1, limit: number = 5) {
+        this.http.get<{data: Employee[], success: boolean, total: number}>(`${this.url}/employees?page=${page}&limit=${limit}`).subscribe(employees => {
+            this.employees$.set(employees?.data);
+            this.employeeCount$.set(employees?.total || 0);
         });
     }
 
-    getEmployees() {
-        this.refreshEmployees();
+    getEmployees(page: number = 1, limit: number = 5) {
+        this.refreshEmployees(page, limit);
         return this.employees$();
     }
 
-    getEmployee(id: string) {
-        this.http.get<Employee>(`${this.url}/employees/${id}`).subscribe(employee => {
-            this.employee$.set(employee);
+    getEmployee(id: string, page: number = 1) {
+        // add pagination 5 employees per page
+        this.http.get<{data: Employee, success: boolean}>(`${this.url}/employees/${id}`).subscribe(employee => {
+            this.employee$.set(employee?.data);
         });
         return this.employee$();
     }
