@@ -1,7 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ToodosStore } from '../store/todos.store';
 import { TodosService } from './todos.service';
 import { JsonPipe } from '@angular/common';
+import { Todo } from '../todos.model';
 
 @Component({
   selector: 'app-todos',
@@ -14,16 +15,14 @@ export class Todos implements OnInit {
 
   constructor(private todosService: TodosService) { }
   store = inject(ToodosStore);
+  isLoading = false;
+  todos$ = signal<Todo[]>([]);
 
   ngOnInit() {
-    this.loadTodos().then(() => {
-      console.log("Todos loaded successfully");
-    }).catch((error) => {
-      console.error("Error loading todos:", error);
+    this.isLoading = true;
+    this.todosService.getTodos().subscribe((val: Todo[]) => {
+      this.todos$.set(val);
+      this.isLoading = false;
     });
-  }
-
-  async loadTodos() {
-    await this.store.loadAllTodos();
   }
 }

@@ -2,6 +2,7 @@ import { inject } from "@angular/core";
 import { Todo } from "../todos.model";
 import {patchState, signalStore, withMethods, withState} from "@ngrx/signals"
 import { TodosService } from "../todos/todos.service";
+import { lastValueFrom } from "rxjs/internal/lastValueFrom";
 
 export type TodosFilter = 
 "all" | "pending" | "completed";
@@ -25,7 +26,7 @@ export const ToodosStore = signalStore({
 
         async loadAllTodos()  {
             patchState(state, { loading: true });
-            const todos = await todosService.getTodos();
+            const todos = await lastValueFrom(todosService.getTodos());
             patchState(state, { todos, loading: false });
         }
     }
